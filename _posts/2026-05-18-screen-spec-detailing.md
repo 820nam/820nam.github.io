@@ -1,7 +1,7 @@
 ---
 title: 화면설계서로 구체화하기
 date: 2026-05-18 21:30:00 +0900
-categories: [기획]
+categories: [와글]
 tags: [화면설계서, 와이어프레임, 기획, 와글]
 mermaid: true
 ---

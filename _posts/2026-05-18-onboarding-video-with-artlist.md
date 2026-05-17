@@ -1,7 +1,7 @@
 ---
 title: Artlist를 활용한 온보딩 영상 제작
 date: 2026-05-18 22:00:00 +0900
-categories: [기획]
+categories: [네이버]
 tags: [온보딩, 영상, AI, Artlist, 운영]
 mermaid: true
 ---

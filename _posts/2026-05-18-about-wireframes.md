@@ -1,7 +1,7 @@
 ---
 title: 와이어프레임에 대해서
 date: 2026-05-18 21:00:00 +0900
-categories: [기획]
+categories: [와글]
 tags: [와이어프레임, 기획, 와글, AI]
 mermaid: true
 ---

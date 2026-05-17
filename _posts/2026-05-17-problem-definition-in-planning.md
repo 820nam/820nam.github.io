@@ -1,7 +1,7 @@
 ---
 title: 문제정의가 기획에서 중요한 이유
 date: 2026-05-17 21:00:00 +0900
-categories: [기획]
+categories: [와글]
 tags: [문제정의, 기획, 와글, 프로덕트]
 mermaid: true
 ---

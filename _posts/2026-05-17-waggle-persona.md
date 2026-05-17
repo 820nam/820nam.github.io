@@ -1,7 +1,7 @@
 ---
 title: 와글의 페르소나를 정의한다면
 date: 2026-05-17 22:00:00 +0900
-categories: [기획]
+categories: [와글]
 tags: [페르소나, 기획, 와글, 타겟]
 mermaid: true
 ---
