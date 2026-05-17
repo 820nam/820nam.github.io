@@ -4,6 +4,9 @@ date: 2026-05-17 12:00:00 +0900
 categories: [기록]
 tags: [기획, 회고, 시작]
 pin: true
+image:
+  path: /assets/img/writing-desk.jpg
+  alt: 책상에서 노트에 글을 쓰는 모습
 ---
 
 ## 왜 블로그를 시작했나
@@ -23,4 +26,9 @@ pin: true
 
 결론만 적지 않는다. **결정에 이르는 과정**을 남긴다. 무엇을 보고 그렇게 판단했는지, 무엇이 틀렸는지 — 나중의 내가 다시 읽고 배우도록.
 
-천천히, 그러나 끝까지 기록한다.
+> 천천히, 그러나 끝까지 기록한다.
+{: .prompt-tip }
+
+---
+
+<sub>커버 이미지 — Shixart1985, [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/)</sub>
