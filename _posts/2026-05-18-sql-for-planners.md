@@ -1,7 +1,7 @@
 ---
 title: 기획자/운영자로서 알아야 하는 SQL 문법 정리
 date: 2026-05-18 23:30:00 +0900
-categories: [기록]
+categories: [SQL]
 tags: [SQL, 데이터, 기획, 운영]
 mermaid: true
 ---
