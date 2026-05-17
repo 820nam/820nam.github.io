@@ -16,7 +16,7 @@ timezone: Asia/Seoul
 
 title: 이길남 # the main title
 
-tagline: 기획하고, 만들고, 기록한다 # it will display as the subtitle
+tagline: 기획하고, 만들고, 운영하며 배운 것을 기록해요 # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   서비스 기획자 이길남의 기록 — 기획·서비스 운영·데이터, 그리고 직접 만든 것들.
