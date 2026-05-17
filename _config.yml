@@ -11,6 +11,9 @@ lang: ko-KR
 # Change to your timezone › https://zones.arilyn.cc
 timezone: Asia/Seoul
 
+# 미래 날짜 게시물도 빌드 (빌드 서버 UTC와 KST 시차로 글이 누락되는 것 방지)
+future: true
+
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
