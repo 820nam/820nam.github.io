@@ -113,6 +113,6 @@ flowchart LR
 ## 참고
 
 - 마스다 무네아키, 『지적자본론』, 이정환 옮김, 민음사 — [민음사](https://minumsa.minumsa.com/book/21037/) · [알라딘](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=69329088)
-- 책을 팔지 않는 서점, 다이칸야마 츠타야 — [민음사 북라이프](http://minumsa.com/booklife/26382/)
-- 다이칸야마 츠타야서점과 지적자본론 — [전종현의 인사이트](http://hyuni.me/2017/08/tsutaya/)
+- 책을 팔지 않는 서점, 다이칸야마 츠타야 — [민음사 북라이프](https://minumsa.com/booklife/26382/)
+- 마스다 무네아키 『지적자본론』 독후감 — [pxd 이야기](https://story.pxd.co.kr/1493)
 - 함께 보기 — [빌더가 되는 과정](/posts/becoming-a-builder/) · [문제정의가 기획에서 중요한 이유](/posts/problem-definition-in-planning/)
