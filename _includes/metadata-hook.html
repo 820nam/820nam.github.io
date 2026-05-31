@@ -18,35 +18,20 @@
     padding: 0.1em 0.36em;
     margin-left: 0.35em;
   }
-  #__nb_debug {
-    position: fixed;
-    top: 8px;
-    right: 8px;
-    z-index: 99999;
-    background: #ff3b30;
-    color: #fff;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-family: monospace;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    max-width: 320px;
-    line-height: 1.4;
-  }
 </style>
 
 <script>
 (function () {
-  function debugBar(msg) {
-    var existing = document.getElementById('__nb_debug');
-    if (existing) existing.remove();
-    var bar = document.createElement('div');
-    bar.id = '__nb_debug';
-    bar.textContent = '[NEW-BADGE] ' + msg;
-    bar.onclick = function () { bar.remove(); };
-    bar.title = '클릭하면 닫힘';
-    document.body.appendChild(bar);
-  }
+  var NEW_DAYS = 7;
+  var cutoffSec = NEW_DAYS * 86400;
+  var futureToleranceSec = 86400;
+
+  /* 빌드 시점에 Liquid가 박아준 URL → Unix timestamp 맵 */
+  var POST_TIMES = {
+    {%- for post in site.posts limit:100 -%}
+    "{{ post.url }}": {{ post.date | date: '%s' }}{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  };
 
   function makeBadge() {
     var b = document.createElement('span');
@@ -55,54 +40,41 @@
     return b;
   }
 
-  function run() {
-    try {
-      var NEW_DAYS = 7;
-      var nowSec = Date.now() / 1000;
-      var cutoffSec = NEW_DAYS * 86400;
-      var cards = document.querySelectorAll('article.card-wrapper');
-      var added = 0;
-      var tried = 0;
-      cards.forEach(function (card) {
-        var t = card.querySelector('time[data-ts]');
-        if (!t) return;
-        var ts = parseInt(t.getAttribute('data-ts'), 10);
-        if (isNaN(ts)) return;
-        var age = nowSec - ts;
-        tried++;
-        if (age <= cutoffSec && age >= -86400) {
-          var title = card.querySelector('.card-title');
-          if (title && !title.querySelector('.new-badge')) {
-            title.appendChild(makeBadge());
-            added++;
-          }
-        }
-      });
-
-      var LATEST_URL = "{{ site.posts | first | map: 'url' | first }}";
-      var LATEST_TS = {{ site.posts | first | map: 'date' | first | date: '%s' | default: 0 }};
-      var sidebarHit = false;
-      if (LATEST_TS && nowSec - LATEST_TS <= cutoffSec && nowSec - LATEST_TS >= -86400) {
-        var links = document.querySelectorAll('#access-lastmod ul li a');
-        for (var i = 0; i < links.length; i++) {
-          if (links[i].getAttribute('href') === LATEST_URL && !links[i].querySelector('.new-badge')) {
-            links[i].appendChild(makeBadge());
-            sidebarHit = true;
-            break;
-          }
-        }
-      }
-
-      debugBar('OK · cards=' + cards.length + ' · checked=' + tried + ' · added=' + added + ' · sidebar=' + sidebarHit + ' (클릭=닫기)');
-    } catch (e) {
-      debugBar('ERROR: ' + e.message);
-    }
+  function isNew(ts) {
+    var age = Date.now() / 1000 - ts;
+    return age <= cutoffSec && age >= -futureToleranceSec;
   }
 
-  if (document.readyState === 'complete') {
-    run();
+  function run() {
+    /* 1) 카드형 글 목록 (홈/카테고리/태그/아카이브) — URL로 매칭 */
+    var cardLinks = document.querySelectorAll('article.card-wrapper a[href]');
+    cardLinks.forEach(function (a) {
+      var href = a.getAttribute('href');
+      var ts = POST_TIMES[href];
+      if (typeof ts !== 'number' || !isNew(ts)) return;
+      var card = a.closest('article.card-wrapper');
+      if (!card) return;
+      var title = card.querySelector('.card-title');
+      if (title && !title.querySelector('.new-badge')) {
+        title.appendChild(makeBadge());
+      }
+    });
+
+    /* 2) 사이드바 "최근 업데이트" — 동일하게 URL로 매칭 */
+    document.querySelectorAll('#access-lastmod ul li a').forEach(function (a) {
+      var href = a.getAttribute('href');
+      var ts = POST_TIMES[href];
+      if (typeof ts !== 'number' || !isNew(ts)) return;
+      if (!a.querySelector('.new-badge')) {
+        a.appendChild(makeBadge());
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
   } else {
-    window.addEventListener('load', run);
+    run();
   }
 })();
 </script>
