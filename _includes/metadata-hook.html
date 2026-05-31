@@ -30,15 +30,29 @@
     display: inline-flex;
     align-items: center;
     margin-left: 0.6rem;
+    white-space: nowrap;
   }
+  /* 사이드바 사이트 총 방문 — 충분한 여백 + 위/아래 구분선 */
   .site-counter-wrap {
     display: flex;
     justify-content: center;
-    padding: 0.8rem 0.4rem 0.2rem;
+    padding: 1.4rem 0.4rem;
+    margin: 0.6rem 0 0.4rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
     width: 100%;
   }
   .site-counter-wrap img {
-    height: 1.7em;
+    height: 1.8em;
+  }
+  /* 라이트 모드 구분선 색상 */
+  html:not([data-mode="dark"]) .site-counter-wrap {
+    border-top-color: rgba(0,0,0,0.06);
+    border-bottom-color: rgba(0,0,0,0.06);
+  }
+  /* 카드 안의 조회수 배지는 조금 더 작게 */
+  article.card-wrapper .view-counter-img {
+    height: 1.35em;
   }
 </style>
 
@@ -105,21 +119,36 @@
   }
 
   function applyViewCounters() {
-    /* (a) 글 상세 페이지에서만 — 글의 조회수 배지를 .post-meta에 부착 */
+    /* (a) 글 상세 페이지 — 글 상단에 조회수 배지 */
     if (/^\/posts\//.test(location.pathname)) {
       var postKey = SITE_KEY + location.pathname.replace(/\/$/, '');
       var img = makeViewCounter(postKey, '조회', '212529');
       var wrap = document.createElement('span');
       wrap.className = 'view-counter-wrap';
       wrap.appendChild(img);
-      /* 글 상단 작성일/작성자 영역 */
       var meta = document.querySelector('.post-meta.text-muted') || document.querySelector('header .post-meta') || document.querySelector('.post-meta');
       if (meta && !meta.querySelector('.view-counter-wrap')) {
         meta.appendChild(wrap);
       }
     }
 
-    /* (b) 모든 페이지의 사이드바에 사이트 총 방문 배지 */
+    /* (b) 목록 페이지 카드들 — 각 카드 .post-meta에도 조회수 배지 */
+    document.querySelectorAll('article.card-wrapper a[href]').forEach(function (a) {
+      var href = a.getAttribute('href') || '';
+      if (!/^\/posts\//.test(href)) return;
+      var card = a.closest('article.card-wrapper');
+      if (!card) return;
+      var cardMeta = card.querySelector('.post-meta');
+      if (!cardMeta || cardMeta.querySelector('.view-counter-wrap')) return;
+      var cardKey = SITE_KEY + href.replace(/\/$/, '');
+      var cardImg = makeViewCounter(cardKey, '조회', '6c757d');
+      var cardWrap = document.createElement('span');
+      cardWrap.className = 'view-counter-wrap';
+      cardWrap.appendChild(cardImg);
+      cardMeta.appendChild(cardWrap);
+    });
+
+    /* (c) 모든 페이지의 사이드바에 사이트 총 방문 배지 */
     var sidebar = document.getElementById('sidebar');
     if (sidebar && !sidebar.querySelector('.site-counter-wrap')) {
       var siteImg = makeViewCounter(SITE_KEY, '방문', '0066ff');
