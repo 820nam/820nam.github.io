@@ -34,16 +34,24 @@
   }
 
   function run() {
-    document.querySelectorAll('article.card-wrapper').forEach(function (card) {
+    var cards = document.querySelectorAll('article.card-wrapper');
+    console.log('[new-badge] cards found:', cards.length, '| nowSec:', nowSec);
+    cards.forEach(function (card, idx) {
       var t = card.querySelector('time[data-ts]');
-      if (!t) return;
+      if (!t) { console.log('[new-badge] card', idx, 'no time element'); return; }
       var ts = parseInt(t.getAttribute('data-ts'), 10);
-      if (isNaN(ts)) return;
+      if (isNaN(ts)) { console.log('[new-badge] card', idx, 'invalid ts'); return; }
       var age = nowSec - ts;
-      if (age <= cutoffSec && age >= -86400) {
+      var ageDays = (age / 86400).toFixed(2);
+      var hit = (age <= cutoffSec && age >= -86400);
+      console.log('[new-badge] card', idx, '| ts:', ts, '| age(days):', ageDays, '| NEW:', hit);
+      if (hit) {
         var title = card.querySelector('.card-title');
         if (title && !title.querySelector('.new-badge')) {
           title.appendChild(makeBadge());
+          console.log('[new-badge] ★ badge added to:', title.textContent.substring(0, 30));
+        } else {
+          console.log('[new-badge] card', idx, 'no .card-title or already has badge');
         }
       }
     });
