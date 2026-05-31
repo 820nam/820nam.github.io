@@ -118,8 +118,12 @@
     return img;
   }
 
+  /* GoatCounter 셋업 시 GC_CODE를 채워주면 카드 조회수가 정확히 표시됨
+     (https://[GC_CODE].goatcounter.com 의 GC_CODE 부분) */
+  var GC_CODE = "{{ site.analytics.goatcounter.id | default: '' }}";
+
   function applyViewCounters() {
-    /* (a) 글 상세 페이지 — 글 상단에 조회수 배지 */
+    /* (a) 글 상세 페이지 — 글 상단에 조회수 배지 (hits.sh, 실제 방문만 증가) */
     if (/^\/posts\//.test(location.pathname)) {
       var postKey = SITE_KEY + location.pathname.replace(/\/$/, '');
       var img = makeViewCounter(postKey, '조회', '212529');
@@ -132,21 +136,36 @@
       }
     }
 
-    /* (b) 목록 페이지 카드들 — 각 카드 .post-meta에도 조회수 배지 */
-    document.querySelectorAll('article.card-wrapper a[href]').forEach(function (a) {
-      var href = a.getAttribute('href') || '';
-      if (!/^\/posts\//.test(href)) return;
-      var card = a.closest('article.card-wrapper');
-      if (!card) return;
-      var cardMeta = card.querySelector('.post-meta');
-      if (!cardMeta || cardMeta.querySelector('.view-counter-wrap')) return;
-      var cardKey = SITE_KEY + href.replace(/\/$/, '');
-      var cardImg = makeViewCounter(cardKey, '조회', '6c757d');
-      var cardWrap = document.createElement('span');
-      cardWrap.className = 'view-counter-wrap';
-      cardWrap.appendChild(cardImg);
-      cardMeta.appendChild(cardWrap);
-    });
+    /* (b) 카드별 조회수 — GoatCounter가 셋업되어 있을 때만 표시
+       (hits.sh는 카드에 박으면 클릭 안 해도 카운트 +1되는 inflate 문제 있음 → 사용 안 함) */
+    if (GC_CODE) {
+      document.querySelectorAll('article.card-wrapper a[href]').forEach(function (a) {
+        var href = a.getAttribute('href') || '';
+        if (!/^\/posts\//.test(href)) return;
+        var card = a.closest('article.card-wrapper');
+        if (!card) return;
+        var cardMeta = card.querySelector('.post-meta');
+        if (!cardMeta || cardMeta.querySelector('.view-counter-text')) return;
+        var span = document.createElement('span');
+        span.className = 'view-counter-text';
+        span.style.cssText = 'margin-left:0.6rem;color:#6c757d;font-size:0.9em;white-space:nowrap;';
+        span.textContent = '👁 …';
+        cardMeta.appendChild(span);
+        /* GoatCounter API: GET counts (no increment) */
+        fetch('https://' + GC_CODE + '.goatcounter.com/counter/' + encodeURIComponent(href) + '.json')
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (j) {
+            if (j && typeof j.count_unique !== 'undefined') {
+              span.textContent = '👁 ' + j.count_unique;
+            } else if (j && typeof j.count !== 'undefined') {
+              span.textContent = '👁 ' + j.count;
+            } else {
+              span.textContent = '👁 0';
+            }
+          })
+          .catch(function () { span.textContent = '👁 0'; });
+      });
+    }
 
     /* (c) 모든 페이지의 사이드바에 사이트 총 방문 배지 */
     var sidebar = document.getElementById('sidebar');
