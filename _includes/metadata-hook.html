@@ -18,13 +18,35 @@
     padding: 0.1em 0.36em;
     margin-left: 0.35em;
   }
+  #__nb_debug {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    z-index: 99999;
+    background: #ff3b30;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: monospace;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    max-width: 320px;
+    line-height: 1.4;
+  }
 </style>
 
 <script>
 (function () {
-  var NEW_DAYS = 7;
-  var nowSec = Date.now() / 1000;
-  var cutoffSec = NEW_DAYS * 86400;
+  function debugBar(msg) {
+    var existing = document.getElementById('__nb_debug');
+    if (existing) existing.remove();
+    var bar = document.createElement('div');
+    bar.id = '__nb_debug';
+    bar.textContent = '[NEW-BADGE] ' + msg;
+    bar.onclick = function () { bar.remove(); };
+    bar.title = '클릭하면 닫힘';
+    document.body.appendChild(bar);
+  }
 
   function makeBadge() {
     var b = document.createElement('span');
@@ -34,47 +56,53 @@
   }
 
   function run() {
-    var cards = document.querySelectorAll('article.card-wrapper');
-    console.log('[new-badge] cards found:', cards.length, '| nowSec:', nowSec);
-    cards.forEach(function (card, idx) {
-      var t = card.querySelector('time[data-ts]');
-      if (!t) { console.log('[new-badge] card', idx, 'no time element'); return; }
-      var ts = parseInt(t.getAttribute('data-ts'), 10);
-      if (isNaN(ts)) { console.log('[new-badge] card', idx, 'invalid ts'); return; }
-      var age = nowSec - ts;
-      var ageDays = (age / 86400).toFixed(2);
-      var hit = (age <= cutoffSec && age >= -86400);
-      console.log('[new-badge] card', idx, '| ts:', ts, '| age(days):', ageDays, '| NEW:', hit);
-      if (hit) {
-        var title = card.querySelector('.card-title');
-        if (title && !title.querySelector('.new-badge')) {
-          title.appendChild(makeBadge());
-          console.log('[new-badge] ★ badge added to:', title.textContent.substring(0, 30));
-        } else {
-          console.log('[new-badge] card', idx, 'no .card-title or already has badge');
+    try {
+      var NEW_DAYS = 7;
+      var nowSec = Date.now() / 1000;
+      var cutoffSec = NEW_DAYS * 86400;
+      var cards = document.querySelectorAll('article.card-wrapper');
+      var added = 0;
+      var tried = 0;
+      cards.forEach(function (card) {
+        var t = card.querySelector('time[data-ts]');
+        if (!t) return;
+        var ts = parseInt(t.getAttribute('data-ts'), 10);
+        if (isNaN(ts)) return;
+        var age = nowSec - ts;
+        tried++;
+        if (age <= cutoffSec && age >= -86400) {
+          var title = card.querySelector('.card-title');
+          if (title && !title.querySelector('.new-badge')) {
+            title.appendChild(makeBadge());
+            added++;
+          }
         }
-      }
-    });
+      });
 
-    {% assign latest = site.posts | first %}{% if latest %}
-    var LATEST_URL = "{{ latest.url }}";
-    var LATEST_TS = {{ latest.date | date: '%s' }};
-    if (nowSec - LATEST_TS <= cutoffSec && nowSec - LATEST_TS >= -86400) {
-      var links = document.querySelectorAll('#access-lastmod ul li a');
-      for (var i = 0; i < links.length; i++) {
-        if (links[i].getAttribute('href') === LATEST_URL && !links[i].querySelector('.new-badge')) {
-          links[i].appendChild(makeBadge());
-          break;
+      var LATEST_URL = "{{ site.posts | first | map: 'url' | first }}";
+      var LATEST_TS = {{ site.posts | first | map: 'date' | first | date: '%s' | default: 0 }};
+      var sidebarHit = false;
+      if (LATEST_TS && nowSec - LATEST_TS <= cutoffSec && nowSec - LATEST_TS >= -86400) {
+        var links = document.querySelectorAll('#access-lastmod ul li a');
+        for (var i = 0; i < links.length; i++) {
+          if (links[i].getAttribute('href') === LATEST_URL && !links[i].querySelector('.new-badge')) {
+            links[i].appendChild(makeBadge());
+            sidebarHit = true;
+            break;
+          }
         }
       }
+
+      debugBar('OK · cards=' + cards.length + ' · checked=' + tried + ' · added=' + added + ' · sidebar=' + sidebarHit + ' (클릭=닫기)');
+    } catch (e) {
+      debugBar('ERROR: ' + e.message);
     }
-    {% endif %}
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', run);
-  } else {
+  if (document.readyState === 'complete') {
     run();
+  } else {
+    window.addEventListener('load', run);
   }
 })();
 </script>
