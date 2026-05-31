@@ -40,7 +40,7 @@
       var ts = parseInt(t.getAttribute('data-ts'), 10);
       if (isNaN(ts)) return;
       var age = nowSec - ts;
-      if (age >= 0 && age <= cutoffSec) {
+      if (age <= cutoffSec && age >= -86400) {
         var title = card.querySelector('.card-title');
         if (title && !title.querySelector('.new-badge')) {
           title.appendChild(makeBadge());
@@ -51,7 +51,7 @@
     {% assign latest = site.posts | first %}{% if latest %}
     var LATEST_URL = "{{ latest.url }}";
     var LATEST_TS = {{ latest.date | date: '%s' }};
-    if (nowSec - LATEST_TS >= 0 && nowSec - LATEST_TS <= cutoffSec) {
+    if (nowSec - LATEST_TS <= cutoffSec && nowSec - LATEST_TS >= -86400) {
       var links = document.querySelectorAll('#access-lastmod ul li a');
       for (var i = 0; i < links.length; i++) {
         if (links[i].getAttribute('href') === LATEST_URL && !links[i].querySelector('.new-badge')) {
