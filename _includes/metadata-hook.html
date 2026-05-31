@@ -1,4 +1,3 @@
-<!-- ── NEW 배지 (최근 7일 이내 글) ── -->
 <style>
   .new-badge {
     display: inline-block;
@@ -35,7 +34,6 @@
   }
 
   function run() {
-    // 1) 카드형 글 목록 (홈/카테고리/태그/아카이브)
     document.querySelectorAll('article.card-wrapper').forEach(function (card) {
       var t = card.querySelector('time[data-ts]');
       if (!t) return;
@@ -50,9 +48,7 @@
       }
     });
 
-    // 2) 사이드바 "최근 업데이트" — 가장 최근 글이 N일 이내이면 그 항목에만 마크
-    {% assign latest = site.posts | first %}
-    {% if latest %}
+    {% assign latest = site.posts | first %}{% if latest %}
     var LATEST_URL = "{{ latest.url }}";
     var LATEST_TS = {{ latest.date | date: '%s' }};
     if (nowSec - LATEST_TS >= 0 && nowSec - LATEST_TS <= cutoffSec) {
