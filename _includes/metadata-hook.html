@@ -1,0 +1,76 @@
+<!-- ── NEW 배지 (최근 7일 이내 글) ── -->
+<style>
+  .new-badge {
+    display: inline-block;
+    margin-left: 0.45em;
+    padding: 0.12em 0.45em;
+    background: #ff3b30;
+    color: #fff !important;
+    font-size: 0.55em;
+    font-weight: 800;
+    line-height: 1.15;
+    border-radius: 0.3em;
+    vertical-align: middle;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  #access-lastmod .new-badge {
+    font-size: 0.7em;
+    padding: 0.1em 0.36em;
+    margin-left: 0.35em;
+  }
+</style>
+
+<script>
+(function () {
+  var NEW_DAYS = 7;
+  var nowSec = Date.now() / 1000;
+  var cutoffSec = NEW_DAYS * 86400;
+
+  function makeBadge() {
+    var b = document.createElement('span');
+    b.className = 'new-badge';
+    b.textContent = 'N';
+    return b;
+  }
+
+  function run() {
+    // 1) 카드형 글 목록 (홈/카테고리/태그/아카이브)
+    document.querySelectorAll('article.card-wrapper').forEach(function (card) {
+      var t = card.querySelector('time[data-ts]');
+      if (!t) return;
+      var ts = parseInt(t.getAttribute('data-ts'), 10);
+      if (isNaN(ts)) return;
+      var age = nowSec - ts;
+      if (age >= 0 && age <= cutoffSec) {
+        var title = card.querySelector('.card-title');
+        if (title && !title.querySelector('.new-badge')) {
+          title.appendChild(makeBadge());
+        }
+      }
+    });
+
+    // 2) 사이드바 "최근 업데이트" — 가장 최근 글이 N일 이내이면 그 항목에만 마크
+    {% assign latest = site.posts | first %}
+    {% if latest %}
+    var LATEST_URL = "{{ latest.url }}";
+    var LATEST_TS = {{ latest.date | date: '%s' }};
+    if (nowSec - LATEST_TS >= 0 && nowSec - LATEST_TS <= cutoffSec) {
+      var links = document.querySelectorAll('#access-lastmod ul li a');
+      for (var i = 0; i < links.length; i++) {
+        if (links[i].getAttribute('href') === LATEST_URL && !links[i].querySelector('.new-badge')) {
+          links[i].appendChild(makeBadge());
+          break;
+        }
+      }
+    }
+    {% endif %}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+})();
+</script>
